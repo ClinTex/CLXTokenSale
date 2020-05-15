@@ -9,7 +9,7 @@ const Referral = artifacts.require("./CLXReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
 const CLXCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
-const CLXToken = artifacts.require("./CLXToken.sol");
+const CLXToken = artifacts.require("./tests/CLXTokenTest.sol");
 const CLXContribution = artifacts.require("./tests/ContributionTest.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
 const CLXAllocator = artifacts.require("./CLXAllocator.sol");
@@ -134,6 +134,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
         await this.management.setPermission(signAddress, CAN_SET_WHITELISTED, true,{from:owner});
         await this.management.setPermission(owner, CAN_BURN_TOKENS, true,{from:owner});
         await this.management.setWhitelisted(other, true,{from:signAddress});
+        await this.management.setPermission(owner, CAN_LOCK_TOKENS, true, {from: owner});
     });
 
     it('should return the correct name', async function() {
@@ -154,14 +155,14 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
     it('should has correct total supply', async function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal(new BN('0').toString());
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         expect(await this.token.totalSupply()).to.be.bignumber.equal(initialSupply);
 
     });
 
     it('should return correct value with balanceOf', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         expect(await this.token.balanceOf(otherSecond)).to.be.bignumber.equal(initialSupply);
     });
 
@@ -178,7 +179,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should fail if balance less then amount', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         expect(await this.token.balanceOf(otherSecond)).to.be.bignumber.equal(initialSupply);
         await this.token.transfer(owner, new BN(10000), {from: otherSecond})
         expect(await this.token.balanceOf(owner)).to.be.bignumber.equal(new BN(10000));
@@ -197,7 +198,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should be able to transfer tokens', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         const transfer = await this.token.transfer(other, initialSupply, {from: otherSecond});
         expect(transfer.receipt.gasUsed).to.be.below(GAS_LIMIT_TRANSFER);
         await expectEvent.inTransaction(transfer.tx, this.token, 'Transfer', { value: initialSupply, from:otherSecond, to: other });
@@ -208,7 +209,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transfer to incorrect address', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await expectRevert(
             this.token.transfer("a", initialSupply, { from: otherSecond }),
@@ -218,7 +219,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transfer to zero address', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await expectRevert(
             this.token.transfer(ZERO_ADDRESS, initialSupply, { from: otherSecond }),
             'ERC20: transfer to the zero address'
@@ -227,7 +228,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent setting of incorrect owner and spender at allowance method', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await expectRevert(
             this.token.allowance("a", other, {from : other}),
@@ -241,7 +242,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent setting of incorrect spender at approve method', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await expectRevert(
             this.token.approve("a", initialSupply, {from : otherSecond}),
@@ -251,7 +252,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent approving with incorrect value', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await expectRevert(
             this.token.approve(other, "a", {from : otherSecond}),
@@ -261,7 +262,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transferFrom if approve balance less then transfer value', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await this.token.approve(other, new BN(1), {from : otherSecond});
         await expectRevert(
@@ -272,7 +273,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transferFrom if value more then user balance', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await this.token.approve(owner, initialSupply, {from : otherSecond});
         await expectRevert(
@@ -283,7 +284,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transferFrom if value less then zero', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(otherSecond, initialSupply, {from : other});
         await expectRevert(
             this.token.transferFrom(other, otherSecond, initialSupply, {from : otherSecond}),
@@ -293,7 +294,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transferFrom if transfer value less then zero', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
 
         await this.token.approve(other, initialSupply, {from : otherSecond});
         await expectRevert(
@@ -304,7 +305,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent transferFrom to zero address', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, initialSupply, {from : otherSecond});
         await expectRevert(
             this.token.transferFrom(otherSecond, ZERO_ADDRESS, initialSupply, {from : other}),
@@ -314,7 +315,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent approve to zero address', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await expectRevert(
             this.token.approve(ZERO_ADDRESS, initialSupply, {from : otherSecond}),
             'ERC20: approve to the zero address'
@@ -323,7 +324,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent approve from zero address', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await expectRevert(
             this.token.transferFrom(ZERO_ADDRESS, other, new BN(0), {from : other}),
             'ERC20: transfer from the zero address'
@@ -332,7 +333,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should able to set approve value', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         const result = await this.token.approve(other, initialSupply, {from : otherSecond});
         expect(result.receipt.gasUsed).to.be.below(GAS_LIMIT);
         expect(await this.token.allowance(otherSecond, other, {from : other})).to.be.bignumber.equal(initialSupply);
@@ -340,7 +341,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should able to transferFrom tokens', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         const approve = await this.token.approve(other, initialSupply, {from : otherSecond});
         await expectEvent.inTransaction(approve.tx, this.token, 'Approval', { value: initialSupply, owner:otherSecond, spender: other });
         const transfer = await this.token.transferFrom(otherSecond, other, initialSupply, {from : other});
@@ -352,7 +353,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should increase allowed value to approve after using increaseAllowance', async function () {
     await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-    await this.token.mint(otherSecond, initialSupply, {from: owner});
+    await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, new BN(0), {from : otherSecond});
         const increaseAllowance = await this.token.increaseAllowance(other, initialSupply, {from:otherSecond});
         expect(increaseAllowance.receipt.gasUsed).to.be.below(GAS_LIMIT);
@@ -364,7 +365,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should decrease allowed value to approve after using decreaseAllowance', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, initialSupply, {from: otherSecond});
         const decreaseAllowance = await this.token.decreaseAllowance(other, new BN(1), {from: otherSecond});
         expect(decreaseAllowance.receipt.gasUsed).to.be.below(GAS_LIMIT);
@@ -381,7 +382,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent decreaseAllowance with incorrect value', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, initialSupply, {from : otherSecond});
         await expectRevert(
             this.token.decreaseAllowance(other, "a", {from:otherSecond}),
@@ -391,7 +392,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent decreaseAllowance with incorrect spender', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, initialSupply, {from : otherSecond});
         await expectRevert(
             this.token.decreaseAllowance("a", initialSupply, {from:otherSecond}),
@@ -401,7 +402,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent increaseAllowance with incorrect value', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, new BN(0), {from : otherSecond});
         await expectRevert(
             this.token.increaseAllowance(other, "a", {from:otherSecond}),
@@ -411,7 +412,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should prevent increaseAllowance with incorrect spender', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
         await this.token.approve(other, new BN(0), {from: otherSecond});
         await expectRevert(
             this.token.increaseAllowance("a", initialSupply, {from: otherSecond}),
@@ -421,7 +422,11 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should be able to burn tokens', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(owner, initialSupply, {from: owner});
+        await this.token.mintTest(owner, initialSupply, {from: owner});
+        await this.lockupContract.setPostponedStartDate(new BigNumber(startAt).minus(1000).valueOf(),
+            {
+                from: owner
+            })
         const result = await this.token.burn(initialSupply, { from: owner });
         await expectEvent.inTransaction(result.tx, this.token, 'Transfer', { value: initialSupply, from:owner, to: ZERO_ADDRESS });
         expect(result.receipt.gasUsed).to.be.below(GAS_LIMIT_TRANSFER_FROM);
@@ -429,17 +434,41 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
         expect(await this.token.totalSupply()).to.be.bignumber.equal(new BN(0));
     });
 
-    it('should fail if account hasnt balance to burn', async function () {
+    it('shouldnt be able to burn tokens if tokens are locked', async function () {
+        await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
+        await this.token.mintTest(owner, initialSupply, {from: owner});
+        await this.lockupContract.allocationLog(
+            owner,
+            initialSupply,
+            0,
+            3600 * 24 * 5,
+            20,
+            3600 * 24,
+            {from: owner});
         await expectRevert(
             this.token.burn(initialSupply, {from: owner}),
-            'ERROR_WRONG_AMOUNT'
+            'ERROR_NOT_AVAILABLE'
+        );
+    });
+    it('should fail if account hasnt balance to burn', async function () {
+        await this.lockupContract.setPostponedStartDate(new BigNumber(startAt).minus(1000).valueOf(),
+            {
+                from: owner
+            })
+        await expectRevert(
+            this.token.burn(initialSupply, {from: owner}),
+            'ERROR_NOT_AVAILABLE'
         );
     });
 
 
     it('should fail if account hasn\'t permissions to burn', async function () {
         await this.management.setPermission(owner, CAN_MINT_TOKENS, true, {from: owner});
-        await this.token.mint(otherSecond, initialSupply, {from: owner});
+        await this.token.mintTest(otherSecond, initialSupply, {from: owner});
+        await this.lockupContract.setPostponedStartDate(new BigNumber(startAt).minus(1000).valueOf(),
+            {
+                from: owner
+            })
         await expectRevert(
             this.token.burn(initialSupply, {from: otherSecond}),
             'ERROR_ACCESS_DENIED'

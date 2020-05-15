@@ -55,8 +55,8 @@ contract LockupContract is Managed {
     {
         lockedAllocationData[_address].push(_startingAt);
         if (_initialUnlockInPercent > 0) {
-            _amount = _amount.mul(uint256(100)
-                .sub(_initialUnlockInPercent)).div(100);
+            _amount = _amount.mul(uint256(PERCENT_ABS_MAX)
+                .sub(_initialUnlockInPercent)).div(PERCENT_ABS_MAX);
         }
         lockedAllocationData[_address].push(_amount);
         lockedAllocationData[_address].push(_lockPeriodInSeconds);
@@ -92,6 +92,10 @@ contract LockupContract is Managed {
                     continue;
                 }
                 lockedAt = postponedStartDate;
+            }
+            if (lockedAt > _time) {
+                blockedAmount = blockedAmount.add(lockedBalance);
+                continue;
             }
             if (lockedAt.add(lockPeriodInSeconds) > _time) {
                 if (lockedBalance == 0) {

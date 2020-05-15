@@ -4,6 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./managment/Managed.sol";
 import "./LockupContract.sol";
+import "./CLXAllocator.sol";
 
 
 contract CLXToken is ERC20, ERC20Detailed, Managed {
@@ -44,8 +45,15 @@ contract CLXToken is ERC20, ERC20Detailed, Managed {
     )
         public
         requirePermission(CAN_MINT_TOKENS)
+        canCallOnlyRegisteredContract(CONTRACT_ALLOCATOR)
         returns (bool)
     {
+        require(
+            _amount <= CLXAllocator(
+                management.contractRegistry(CONTRACT_ALLOCATOR)
+            ).tokensAvailable(totalSupply()),
+            ERROR_WRONG_AMOUNT
+        );
         _mint(_account, _amount);
         return true;
     }
@@ -90,6 +98,12 @@ contract CLXToken is ERC20, ERC20Detailed, Managed {
     function burn(uint256 value)
         public
         requirePermission(CAN_BURN_TOKENS)
+        requireUnlockedBalance(
+            msg.sender,
+            value,
+            block.timestamp,
+            balanceOf(msg.sender)
+        )
     {
         require(balanceOf(msg.sender) >= value, ERROR_WRONG_AMOUNT);
         super._burn(msg.sender, value);
