@@ -34,7 +34,7 @@ contract TokenAllocator is Managed {
     }
 
     function updateMaxSupply(uint256 _maxSupply)
-        public
+        internal
         requirePermission(CAN_INTERACT_WITH_ALLOCATOR)
     {
         maxSupply = _maxSupply;

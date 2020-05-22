@@ -50,19 +50,13 @@ contract CrowdsaleImpl is Crowdsale, Managed {
     }
 
     /// @notice default payable function
-    function() 
+    function()
         external
-        payable 
+        payable
     {
-        require(allowWhitelisted || allowAnonymous, ERROR_ACCESS_DENIED);
-
-        if (!allowAnonymous && allowWhitelisted) {
-            require(hasPermission(msg.sender, WHITELISTED), ERROR_ACCESS_DENIED);
-        }
-
-        internalContribution(
+        buyInternal(
             msg.sender,
-            PricingStrategy(management.contractRegistry(CONTRACT_PRICING)).getCurrencyAmount(msg.value)
+            msg.value
         );
     }
 
@@ -165,6 +159,22 @@ contract CrowdsaleImpl is Crowdsale, Managed {
             management.contractRegistry(CONTRACT_FORWARDER) != address(0) &&
             management.contractRegistry(CONTRACT_PRICING) != address(0) &&
             management.contractRegistry(CONTRACT_ALLOCATOR) != address(0)
+        );
+    }
+
+    function buyInternal(
+        address payable _contributor,
+        uint256 ethAmount
+    ) internal {
+        require(allowWhitelisted || allowAnonymous, ERROR_ACCESS_DENIED);
+
+        if (!allowAnonymous && allowWhitelisted) {
+            require(hasPermission(_contributor, WHITELISTED), ERROR_ACCESS_DENIED);
+        }
+
+        internalContribution(
+            _contributor,
+            PricingStrategy(management.contractRegistry(CONTRACT_PRICING)).getCurrencyAmount(ethAmount)
         );
     }
 

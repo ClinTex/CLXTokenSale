@@ -25,7 +25,7 @@
     "solium": "solium -d contracts/",
     "precommit": "npm run coverage && npm run solium",
     "test:ci": "./node_modules/.bin/run-with-ganache 'npm run coverage && npm run test' && npm run solium",
-    "rmd": "remixd -s /var/www/bc-hero.contracts/ --remix-ide https://remix.ethereum.org"
+    "rmd": "remixd -s /var/www/clintex.contracts.new/ --remix-ide https://remix.ethereum.org"
   },
   "directories": {
     "test": "test"
