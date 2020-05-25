@@ -1,7 +1,7 @@
 const LockupContract = artifacts.require("./LockupContract.sol");
-const CLXToken = artifacts.require("./CLXToken.sol");
+const XCLToken = artifacts.require("./XCLToken.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const CLXAllocator = artifacts.require("./CLXAllocator.sol");
+const XCLAllocator = artifacts.require("./XCLAllocator.sol");
 const Utils = require("./utils");
 const BigNumber = require("bignumber.js");
 
@@ -32,9 +32,9 @@ contract("lockupLockupContract", accounts => {
 
     beforeEach(async () => {
         management = await Management.new();
-        allocator = await CLXAllocator.new(new BigNumber('10000').multipliedBy(precision), management.address);
+        allocator = await XCLAllocator.new(new BigNumber('10000').multipliedBy(precision), management.address);
         lockup = await LockupContract.new(management.address);
-        token = await CLXToken.new(management.address);
+        token = await XCLToken.new(management.address);
 
         await management.registerContract(CONTRACT_TOKEN, token.address)
             .then(Utils.receiptShouldSucceed);

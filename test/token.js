@@ -1,13 +1,13 @@
-const PricingStrategy = artifacts.require("./CLXPricingStrategy.sol");
-const Referral = artifacts.require("./CLXReferral.sol");
+const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
+const Referral = artifacts.require("./XCLReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const CLXCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
-const CLXToken = artifacts.require("./CLXToken.sol");
-const CLXContribution = artifacts.require("./tests/ContributionTest.sol");
+const XCLCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
+const XCLToken = artifacts.require("./XCLToken.sol");
+const XCLContribution = artifacts.require("./tests/ContributionTest.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const CLXAllocator = artifacts.require("./CLXAllocator.sol");
-const Stats = artifacts.require("./CLXStats.sol");
+const XCLAllocator = artifacts.require("./XCLAllocator.sol");
+const Stats = artifacts.require("./XCLStats.sol");
 
 const Utils = require("./utils");
 const BigNumber = require('bignumber.js');
@@ -88,17 +88,17 @@ contract('Token', function (accounts) {
             new BigNumber("171.84").multipliedBy(currencyPrecision).valueOf(),
             tiers
         );
-        crowdsale = await CLXCrowdsale.new(
+        crowdsale = await XCLCrowdsale.new(
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             management.address
         );
 
-        token = await CLXToken.new(management.address);
+        token = await XCLToken.new(management.address);
 
-        allocator = await CLXAllocator.new('200000000000000000000000000', management.address);
+        allocator = await XCLAllocator.new('200000000000000000000000000', management.address);
 
-        forwarder = await CLXContribution.new(
+        forwarder = await XCLContribution.new(
             etherHolder,
             management.address
         );

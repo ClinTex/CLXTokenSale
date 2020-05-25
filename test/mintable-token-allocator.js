@@ -1,5 +1,5 @@
 const MintableTokenAllocator = artifacts.require("allocator/MintableTokenAllocator.sol");
-const MintableToken = artifacts.require("./CLXToken.sol");
+const MintableToken = artifacts.require("./XCLToken.sol");
 const Management = artifacts.require("./managment/Management.sol");
 const Utils = require("./utils");
 const BigNumber = require("bignumber.js");

@@ -6,16 +6,18 @@ const BigNumber = require('bignumber.js');
 let other, otherSecond, signAddress, etherHolder;
 const {expect} = require('chai');
 const abi = require("ethereumjs-abi");
-const PricingStrategy = artifacts.require("./CLXPricingStrategy.sol");
-const Referral = artifacts.require("./CLXReferral.sol");
+const ethUtil = require('ethereumjs-util');
+const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
+const Referral = artifacts.require("./XCLReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const CLXCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
-const CLXToken = artifacts.require("./CLXToken.sol");
-const CLXContribution = artifacts.require("./tests/ContributionTest.sol");
+const XCLCrowdsale = artifacts.require("./XCLCrowdsale.sol");
+const XCLToken = artifacts.require("./XCLToken.sol");
+const XCLContribution = artifacts.require("./XCLContribution.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const CLXAllocator = artifacts.require("./CLXAllocator.sol");
-const Stats = artifacts.require("./CLXStats.sol");
+const XCLAllocator = artifacts.require("./XCLAllocator.sol");
+const Stats = artifacts.require("./XCLStats.sol");
+
 const initialSupply = new BigNumber('1000000000000000000').toString();
 const GAS_LIMIT = 60000;
 const GAS_LIMIT_TRANSFER = 80000;
@@ -63,6 +65,39 @@ let startAt, tiers;
 let contr = {};
 contract('Contribution', function ([_, owner, ...otherAccounts]) {
 
+    async function generateVRS(instance, signerPrivateKey,  address) {
+        'use strict';
+        var h = web3.utils.soliditySha3(
+            {t: 'address', v: instance.address}, {t:"address", v:address}
+            );
+        const prefix = Buffer.from('\x19Ethereum Signed Message:\n');
+        const prefixedMsg = ethUtil.keccak(
+            Buffer.concat([prefix, Buffer.from(h)])
+        );
+
+        const {v, r, s} = ethUtil.ecsign(
+            Buffer.from(prefixedMsg, 'hex'),
+            Buffer.from(signerPrivateKey, 'hex')
+        );
+        var data = web3.eth.abi.encodeFunctionCall({
+            name: 'contribute',
+            type: 'function',
+            inputs: [{
+                type: 'uint8',
+                name: '_v'
+            },{
+                type: 'bytes32',
+                name: '_r'
+            },{
+                type: 'bytes32',
+                name: '_s'
+            }]
+        }, [v, ethUtil.bufferToHex(r), ethUtil.bufferToHex(s)]);
+        console.log({v, r: ethUtil.bufferToHex(r), s:ethUtil.bufferToHex(s)});
+        console.log({data});
+
+    }
+
     async function makeTransaction(instance, sign, address, wei) {
         'use strict';
         var h = web3.utils.soliditySha3({t: 'address', v: instance.address}, {t:"address", v:address});
@@ -85,9 +120,9 @@ contract('Contribution', function ([_, owner, ...otherAccounts]) {
                 name: '_s'
             }]
         }, [v, r, s]);
+console.log({v, r, s});
 
-
-        return web3.eth.sendTransaction({from:address, to: instance.address, data: data, value: wei, gas: 0x47E7C4});
+        // return web3.eth.sendTransaction({from:address, to: instance.address, data: data, value: wei, gas: 0x47E7C4});
     }
 
     beforeEach(async function () {
@@ -111,22 +146,22 @@ contract('Contribution', function ([_, owner, ...otherAccounts]) {
             tiers,
             {from: owner}
         );
-        contr.crowdsale = await CLXCrowdsale.new(
+        contr.crowdsale = await XCLCrowdsale.new(
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             contr.management.address,
             {from: owner}
         );
 
-        contr.token = await CLXToken.new(contr.management.address, {from: owner});
+        contr.token = await XCLToken.new(contr.management.address, {from: owner});
 
-        contr.allocator = await CLXAllocator.new(
+        contr.allocator = await XCLAllocator.new(
             '200000000000000000000000000',
             contr.management.address,
             {from: owner}
         );
 
-        contr.forwarder = await CLXContribution.new(
+        contr.forwarder = await XCLContribution.new(
             etherHolder,
             contr.management.address,
             {from: owner}
@@ -186,57 +221,86 @@ contract('Contribution', function ([_, owner, ...otherAccounts]) {
 
         await contr.crowdsale.updateState()
             .then(Utils.receiptShouldSucceed);
+        //
+        // await contr.crowdsale.externalContribution(
+        //     other,
+        //     new BigNumber('100').multipliedBy(currencyPrecision).valueOf(),
+        //     {from:signAddress}
+        // )
+        //     .then(Utils.receiptShouldSucceed);
 
-        await contr.crowdsale.externalContribution(
-            other,
-            new BigNumber('100').multipliedBy(currencyPrecision).valueOf(),
-            {from:signAddress}
+        await Utils.sendTransaction(
+            contr.crowdsale, other, web3.utils.toWei("0.01", "ether"),
+
         )
-            .then(Utils.receiptShouldSucceed);
+        /*
+        // assert.equal(
+        //     new BigNumber(await contr.token.balanceOf.call(other)).valueOf(),
+        //     new BigNumber('34368000000000000000').valueOf(),
+        //     "balance is on equal"
+        // );
 
-        await expectRevert(
-            makeTransaction(contr.crowdsale, otherSecond, other, web3.utils.toWei("1", "ether")),
-            'ERROR_ACCESS_DENIED'
-            );
+         */
+        // await expectRevert(
+        //     makeTransaction(contr.crowdsale, otherSecond, other, web3.utils.toWei("1", "ether")),
+        //     'ERROR_ACCESS_DENIED'
+        //     );
+        //
+        const obj ={
+            address: '0x59d8e848023db12322e5af4d6eb959dfda97ba0c'
+        }
+        let transfer = await makeTransaction(
+            obj,
+            owner,
+            '0x4dd93664e39fbb2a229e6a88eb1da53f4ccc88ac',
+            web3.utils.toWei("0.01", "ether")
+        )
 
-        let transfer = await makeTransaction(contr.crowdsale, signAddress, other, web3.utils.toWei("1", "ether"))
-        expect(transfer.gasUsed).to.be.below(GAS_LIMIT_PURCHASE);
 
-
-        await contr.pricing.updateDates(
-            0,
-            startAt,
-            new BigNumber(startAt).plus(3600),
-            {from:owner}
+console.log('--------');
+        await generateVRS(
+            obj,
+            '27f0df3dac6fc312f2a948cb2ee3eab2bedf8be43c1171907966de0bcca336fa',
+            '0x4dd93664e39fbb2a229e6a88eb1da53f4ccc88ac'
         );
-
-        await Utils.checkState({crowdsale: contr.crowdsale}, {
-            crowdsale: {
-                startDate: startAt,
-                endDate: new BigNumber(startAt).plus(6*MONTH_IN_SECONDS).valueOf(),
-                currentState: 3,
-                tokensSold: '5436800000000000000000',
-                bonusProduced: 0,
-                seedMaxSupply: '20000000000000000000000000',
-                collectedCurrency: new BigNumber('271.84').multipliedBy(currencyPrecision).valueOf(),
-            }
-        });
-
-        await makeTransaction(contr.crowdsale, signAddress, other, web3.utils.toWei("1", "ether"))
-
-        await Utils.checkState({crowdsale: contr.crowdsale}, {
-            crowdsale: {
-                startDate: startAt,
-                endDate: new BigNumber(startAt).plus(3600).valueOf(),
-                currentState: 3,
-                tokensSold: '8873600000000000000000',
-                bonusProduced: 0,
-                seedMaxSupply: '20000000000000000000000000',
-                collectedCurrency: new BigNumber('443.68').multipliedBy(currencyPrecision).valueOf(),
-            }
-        });
+        // expect(transfer.gasUsed).to.be.below(GAS_LIMIT_PURCHASE);
+        //
+        //
+        // await contr.pricing.updateDates(
+        //     0,
+        //     startAt,
+        //     new BigNumber(startAt).plus(3600),
+        //     {from:owner}
+        // );
+        //
+        // await Utils.checkState({crowdsale: contr.crowdsale}, {
+        //     crowdsale: {
+        //         startDate: startAt,
+        //         endDate: new BigNumber(startAt).plus(6*MONTH_IN_SECONDS).valueOf(),
+        //         currentState: 3,
+        //         tokensSold: '5436800000000000000000',
+        //         bonusProduced: 0,
+        //         seedMaxSupply: '20000000000000000000000000',
+        //         collectedCurrency: new BigNumber('271.84').multipliedBy(currencyPrecision).valueOf(),
+        //     }
+        // });
+        //
+        // await makeTransaction(contr.crowdsale, signAddress, other, web3.utils.toWei("1", "ether"))
+        //
+        // await Utils.checkState({crowdsale: contr.crowdsale}, {
+        //     crowdsale: {
+        //         startDate: startAt,
+        //         endDate: new BigNumber(startAt).plus(3600).valueOf(),
+        //         currentState: 3,
+        //         tokensSold: '8873600000000000000000',
+        //         bonusProduced: 0,
+        //         seedMaxSupply: '20000000000000000000000000',
+        //         collectedCurrency: new BigNumber('443.68').multipliedBy(currencyPrecision).valueOf(),
+        //     }
+        // });
 
     });
+    /*
     it("if contribution more than 100k should add to  saft agreement (external contribution)", async function () {
         await Utils.checkState({crowdsale: contr.crowdsale}, {
             crowdsale: {
@@ -393,7 +457,7 @@ contract('Contribution', function ([_, owner, ...otherAccounts]) {
         );
     });
 
-    describe('CLXAllocator',  async () => {
+    describe('XCLAllocator',  async () => {
         beforeEach(async function () {
             await contr.allocator.allocateRequiredTokensToHolders({from:owner});
         });
@@ -725,4 +789,6 @@ contract('Contribution', function ([_, owner, ...otherAccounts]) {
             );
         });
     });
+
+     */
 });

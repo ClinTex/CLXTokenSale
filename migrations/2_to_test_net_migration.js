@@ -1,16 +1,16 @@
 const BN = require("bn.js");
 const BigNumber = require("bignumber.js");
 
-const PricingStrategy = artifacts.require("./CLXPricingStrategy.sol");
-const CLXReferral = artifacts.require("./CLXReferral.sol");
+const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
+const XCLReferral = artifacts.require("./XCLReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const CLXCrowdsale = artifacts.require("./CLXCrowdsale.sol");
-const CLXToken = artifacts.require("./CLXToken.sol");
-const CLXContribution = artifacts.require("./CLXContribution.sol");
+const XCLCrowdsale = artifacts.require("./XCLCrowdsale.sol");
+const XCLToken = artifacts.require("./XCLToken.sol");
+const XCLContribution = artifacts.require("./XCLContribution.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const CLXAllocator = artifacts.require("./CLXAllocator.sol");
-const CLXStats = artifacts.require("./CLXStats.sol");
+const XCLAllocator = artifacts.require("./XCLAllocator.sol");
+const XCLStats = artifacts.require("./XCLStats.sol");
 
 module.exports = function (deployer, network, accounts) {
     const precision = new BN("1000000000000000000").valueOf();
@@ -85,33 +85,33 @@ module.exports = function (deployer, network, accounts) {
     }).then(async () => {
         pricing = await PricingStrategy.deployed();
         return deployer.deploy(
-            CLXCrowdsale,
+            XCLCrowdsale,
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             management.address
         );
     }).then(async () => {
-        crowdsale = await CLXCrowdsale.deployed();
+        crowdsale = await XCLCrowdsale.deployed();
         return deployer.deploy(
-            CLXToken,
+            XCLToken,
             management.address
         );
     }).then(async () => {
-        token = await CLXToken.deployed();
+        token = await XCLToken.deployed();
         return deployer.deploy(
-            CLXAllocator,
+            XCLAllocator,
             "200000000000000000000000000",
             management.address
         );
     }).then(async () => {
-       allocator = await CLXAllocator.deployed();
+       allocator = await XCLAllocator.deployed();
         return deployer.deploy(
-            CLXContribution,
+            XCLContribution,
             etherHolder,
             management.address
         );
     }).then(async () => {
-       forwarder = await CLXContribution.deployed();
+       forwarder = await XCLContribution.deployed();
         return deployer.deploy(
             MintableCrowdsaleOnSuccessAgent,
             management.address
@@ -119,11 +119,11 @@ module.exports = function (deployer, network, accounts) {
     }).then(async () => {
        agent = await MintableCrowdsaleOnSuccessAgent.deployed();
         return deployer.deploy(
-            CLXReferral,
+            XCLReferral,
             management.address
         );
     }).then(async () => {
-       referral = await CLXReferral.deployed();
+       referral = await XCLReferral.deployed();
         return deployer.deploy(
             LockupContract,
             management.address
@@ -131,11 +131,11 @@ module.exports = function (deployer, network, accounts) {
     }).then(async () => {
         lockupContract = await LockupContract.deployed();
         return deployer.deploy(
-            CLXStats,
+            XCLStats,
             management.address
         );
     }).then(async () => {
-       stats = await CLXStats.deployed();
+       stats = await XCLStats.deployed();
     }).then(async () => {
 
         await management.registerContract(CONTRACT_TOKEN, token.address)

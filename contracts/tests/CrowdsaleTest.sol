@@ -1,15 +1,15 @@
 pragma solidity 0.5.17;
 
-import "../CLXCrowdsale.sol";
+import "../XCLCrowdsale.sol";
 
 
-contract CrowdsaleTest is CLXCrowdsale {
+contract CrowdsaleTest is XCLCrowdsale {
 
     constructor(
         uint256 _startTime,
         uint256 _endTime,
         address _management
-    ) public CLXCrowdsale(
+    ) public XCLCrowdsale(
         _startTime,
         _endTime,
         _management

@@ -5,16 +5,16 @@ const {ZERO_ADDRESS} = constants;
 const BigNumber = require('bignumber.js');
 let other, otherSecond, signAddress, etherHolder;
 const {expect} = require('chai');
-const PricingStrategy = artifacts.require("./CLXPricingStrategy.sol");
-const Referral = artifacts.require("./CLXReferral.sol");
+const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
+const Referral = artifacts.require("./XCLReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const CLXCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
-const CLXToken = artifacts.require("./CLXToken.sol");
-const CLXContribution = artifacts.require("./tests/ContributionTest.sol");
+const XCLCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
+const XCLToken = artifacts.require("./XCLToken.sol");
+const XCLContribution = artifacts.require("./tests/ContributionTest.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const CLXAllocator = artifacts.require("./CLXAllocator.sol");
-const Stats = artifacts.require("./CLXStats.sol");
+const XCLAllocator = artifacts.require("./XCLAllocator.sol");
+const Stats = artifacts.require("./XCLStats.sol");
 const initialSupply = new BigNumber('1000000000000000000').toString();
 const GAS_LIMIT = 60000;
 const GAS_LIMIT_TRANSFER = 80000;
@@ -81,22 +81,22 @@ contract('Contribution', function ([_, owner, ...otherAccounts]) {
             tiers,
             {from: owner}
         );
-        contr.crowdsale = await CLXCrowdsale.new(
+        contr.crowdsale = await XCLCrowdsale.new(
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             contr.management.address,
             {from: owner}
         );
 
-        contr.token = await CLXToken.new(contr.management.address, {from: owner});
+        contr.token = await XCLToken.new(contr.management.address, {from: owner});
 
-        contr.allocator = await CLXAllocator.new(
+        contr.allocator = await XCLAllocator.new(
             '200000000000000000000000000',
             contr.management.address,
             {from: owner}
         );
 
-        contr.forwarder = await CLXContribution.new(
+        contr.forwarder = await XCLContribution.new(
             etherHolder,
             contr.management.address,
             {from: owner}

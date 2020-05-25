@@ -1,15 +1,15 @@
 pragma solidity 0.5.17;
 
-import "../CLXToken.sol";
+import "../XCLToken.sol";
 
 
-contract CLXTokenTest is CLXToken{
+contract XCLTokenTest is XCLToken{
 
     constructor(
         address _management
     )
         public
-        CLXToken(_management)
+        XCLToken(_management)
     {
     }
 
@@ -23,7 +23,7 @@ contract CLXTokenTest is CLXToken{
         returns (bool)
     {
         require(
-            _amount <= CLXAllocator(
+            _amount <= XCLAllocator(
                 management.contractRegistry(CONTRACT_ALLOCATOR)
             ).tokensAvailable(totalSupply()),
             ERROR_WRONG_AMOUNT
