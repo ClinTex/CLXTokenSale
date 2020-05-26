@@ -2,11 +2,11 @@ pragma solidity 0.5.17;
 
 import "./managment/Managed.sol";
 import "./allocator/TokenAllocator.sol";
-import "./CLXToken.sol";
+import "./CLIToken.sol";
 import "./LockupContract.sol";
 
 
-contract CLXReferral is Managed {
+contract CLIReferral is Managed {
 
     uint256 public referralMaxSupply = 800000e18;
     uint256 public referralPercent = 4;
@@ -59,7 +59,7 @@ contract CLXReferral is Managed {
         ).allocate(
             referrer,
             allocatedTokens,
-            CLXToken(management.contractRegistry(CONTRACT_TOKEN)).totalSupply()
+            CLIToken(management.contractRegistry(CONTRACT_TOKEN)).totalSupply()
         );
         // unlock initial 25% tokens
         // lock 25% tokens for 6 months

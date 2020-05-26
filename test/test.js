@@ -4,16 +4,16 @@ const { ZERO_ADDRESS } = constants;
 const BigNumber = require('bignumber.js');
 let other,otherSecond, signAddress,etherHolder;
 const { expect } = require('chai');
-const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
-const Referral = artifacts.require("./XCLReferral.sol");
+const PricingStrategy = artifacts.require("./CLIPricingStrategy.sol");
+const Referral = artifacts.require("./CLIReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const XCLCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
-const XCLToken = artifacts.require("./tests/XCLTokenTest.sol");
-const XCLContribution = artifacts.require("./tests/ContributionTest.sol");
+const CLICrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
+const CLIToken = artifacts.require("./tests/CLITokenTest.sol");
+const CLIContribution = artifacts.require("./tests/ContributionTest.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const XCLAllocator = artifacts.require("./XCLAllocator.sol");
-const Stats = artifacts.require("./XCLStats.sol");
+const CLIAllocator = artifacts.require("./CLIAllocator.sol");
+const Stats = artifacts.require("./CLIStats.sol");
 const initialSupply = new BigNumber('1000000000000000000').toString();
 const GAS_LIMIT = 60000;
 const GAS_LIMIT_TRANSFER = 80000;
@@ -43,7 +43,7 @@ const CAN_UPDATE_PRICE = 4;
 const CAN_INTERACT_WITH_ALLOCATOR = 5;
 const CAN_SET_ALLOCATOR_MAX_SUPPLY = 6;
 const CAN_PAUSE_TOKENS = 7;
-const EXCLUDED_ADDRESSES = 8;
+const ECLIUDED_ADDRESSES = 8;
 const WHITELISTED = 9;
 const SIGNERS = 10;
 const EXTERNAL_CONTRIBUTORS = 11;
@@ -79,22 +79,22 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
             tiers,
             { from: owner }
         );
-        this.crowdsale = await XCLCrowdsale.new(
+        this.crowdsale = await CLICrowdsale.new(
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             this.management.address,
             { from: owner }
         );
 
-        this.token = await XCLToken.new(this.management.address,{ from: owner });
+        this.token = await CLIToken.new(this.management.address,{ from: owner });
 
-        this.allocator = await XCLAllocator.new(
+        this.allocator = await CLIAllocator.new(
             '200000000000000000000000000',
             this.management.address,
             { from: owner }
         );
 
-        this.forwarder = await XCLContribution.new(
+        this.forwarder = await CLIContribution.new(
             etherHolder,
             this.management.address,
             { from: owner }
@@ -144,7 +144,7 @@ contract('Token', function ([_, owner, ...otherAccounts]) {
 
     it('should return the correct symbol', async function() {
         let symbol = await this.token.symbol();
-        assert.equal(symbol, "XCL");
+        assert.equal(symbol, "CLI");
     });
 
     it('should return the correct decimals', async function() {

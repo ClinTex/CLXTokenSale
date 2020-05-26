@@ -1,10 +1,10 @@
 pragma solidity 0.5.17;
 
 import "./contribution/ContributionForwarder.sol";
-import "./XCLToken.sol";
+import "./CLIToken.sol";
 
 
-contract XCLContribution is ContributionForwarder {
+contract CLIContribution is ContributionForwarder {
 
     address payable public receiver;
 

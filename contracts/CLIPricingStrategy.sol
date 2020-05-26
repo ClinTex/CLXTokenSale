@@ -3,7 +3,7 @@ pragma solidity 0.5.17;
 import "./pricing/PricingStrategyImpl.sol";
 
 
-contract XCLPricingStrategy is PricingStrategyImpl {
+contract CLIPricingStrategy is PricingStrategyImpl {
 
     constructor(
         address _management,

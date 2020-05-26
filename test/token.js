@@ -1,13 +1,13 @@
-const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
-const Referral = artifacts.require("./XCLReferral.sol");
+const PricingStrategy = artifacts.require("./CLIPricingStrategy.sol");
+const Referral = artifacts.require("./CLIReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const XCLCrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
-const XCLToken = artifacts.require("./XCLToken.sol");
-const XCLContribution = artifacts.require("./tests/ContributionTest.sol");
+const CLICrowdsale = artifacts.require("./tests/CrowdsaleTest.sol");
+const CLIToken = artifacts.require("./CLIToken.sol");
+const CLIContribution = artifacts.require("./tests/ContributionTest.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const XCLAllocator = artifacts.require("./XCLAllocator.sol");
-const Stats = artifacts.require("./XCLStats.sol");
+const CLIAllocator = artifacts.require("./CLIAllocator.sol");
+const Stats = artifacts.require("./CLIStats.sol");
 
 const Utils = require("./utils");
 const BigNumber = require('bignumber.js');
@@ -35,7 +35,7 @@ const CAN_UPDATE_PRICE = 4;
 const CAN_INTERACT_WITH_ALLOCATOR = 5;
 const CAN_SET_ALLOCATOR_MAX_SUPPLY = 6;
 const CAN_PAUSE_TOKENS = 7;
-const EXCLUDED_ADDRESSES = 8;
+const ECLIUDED_ADDRESSES = 8;
 const WHITELISTED = 9;
 const SIGNERS = 10;
 const EXTERNAL_CONTRIBUTORS = 11;
@@ -88,17 +88,17 @@ contract('Token', function (accounts) {
             new BigNumber("171.84").multipliedBy(currencyPrecision).valueOf(),
             tiers
         );
-        crowdsale = await XCLCrowdsale.new(
+        crowdsale = await CLICrowdsale.new(
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             management.address
         );
 
-        token = await XCLToken.new(management.address);
+        token = await CLIToken.new(management.address);
 
-        allocator = await XCLAllocator.new('200000000000000000000000000', management.address);
+        allocator = await CLIAllocator.new('200000000000000000000000000', management.address);
 
-        forwarder = await XCLContribution.new(
+        forwarder = await CLIContribution.new(
             etherHolder,
             management.address
         );

@@ -1,16 +1,16 @@
 const BN = require("bn.js");
 const BigNumber = require("bignumber.js");
 
-const PricingStrategy = artifacts.require("./XCLPricingStrategy.sol");
-const XCLReferral = artifacts.require("./XCLReferral.sol");
+const PricingStrategy = artifacts.require("./CLIPricingStrategy.sol");
+const CLIReferral = artifacts.require("./CLIReferral.sol");
 const LockupContract = artifacts.require("./LockupContract.sol");
 const Management = artifacts.require("./managment/Management.sol");
-const XCLCrowdsale = artifacts.require("./XCLCrowdsale.sol");
-const XCLToken = artifacts.require("./XCLToken.sol");
-const XCLContribution = artifacts.require("./XCLContribution.sol");
+const CLICrowdsale = artifacts.require("./CLICrowdsale.sol");
+const CLIToken = artifacts.require("./CLIToken.sol");
+const CLIContribution = artifacts.require("./CLIContribution.sol");
 const MintableCrowdsaleOnSuccessAgent = artifacts.require("./agent/MintableCrowdsaleOnSuccessAgent.sol");
-const XCLAllocator = artifacts.require("./XCLAllocator.sol");
-const XCLStats = artifacts.require("./XCLStats.sol");
+const CLIAllocator = artifacts.require("./CLIAllocator.sol");
+const CLIStats = artifacts.require("./CLIStats.sol");
 
 module.exports = function (deployer, network, accounts) {
     const precision = new BN("1000000000000000000").valueOf();
@@ -36,7 +36,7 @@ module.exports = function (deployer, network, accounts) {
     const CAN_INTERACT_WITH_ALLOCATOR = 5;
     const CAN_SET_ALLOCATOR_MAX_SUPPLY = 6;
     const CAN_PAUSE_TOKENS = 7;
-    const EXCLUDED_ADDRESSES = 8;
+    const ECLIUDED_ADDRESSES = 8;
     const WHITELISTED = 9;
     const SIGNERS = 10;
     const EXTERNAL_CONTRIBUTORS = 11;
@@ -85,33 +85,33 @@ module.exports = function (deployer, network, accounts) {
     }).then(async () => {
         pricing = await PricingStrategy.deployed();
         return deployer.deploy(
-            XCLCrowdsale,
+            CLICrowdsale,
             startAt,
             new BigNumber(startAt).plus(new BigNumber("6").multipliedBy(MONTH_IN_SECONDS)).valueOf(),
             management.address
         );
     }).then(async () => {
-        crowdsale = await XCLCrowdsale.deployed();
+        crowdsale = await CLICrowdsale.deployed();
         return deployer.deploy(
-            XCLToken,
+            CLIToken,
             management.address
         );
     }).then(async () => {
-        token = await XCLToken.deployed();
+        token = await CLIToken.deployed();
         return deployer.deploy(
-            XCLAllocator,
+            CLIAllocator,
             "200000000000000000000000000",
             management.address
         );
     }).then(async () => {
-       allocator = await XCLAllocator.deployed();
+       allocator = await CLIAllocator.deployed();
         return deployer.deploy(
-            XCLContribution,
+            CLIContribution,
             etherHolder,
             management.address
         );
     }).then(async () => {
-       forwarder = await XCLContribution.deployed();
+       forwarder = await CLIContribution.deployed();
         return deployer.deploy(
             MintableCrowdsaleOnSuccessAgent,
             management.address
@@ -119,11 +119,11 @@ module.exports = function (deployer, network, accounts) {
     }).then(async () => {
        agent = await MintableCrowdsaleOnSuccessAgent.deployed();
         return deployer.deploy(
-            XCLReferral,
+            CLIReferral,
             management.address
         );
     }).then(async () => {
-       referral = await XCLReferral.deployed();
+       referral = await CLIReferral.deployed();
         return deployer.deploy(
             LockupContract,
             management.address
@@ -131,11 +131,11 @@ module.exports = function (deployer, network, accounts) {
     }).then(async () => {
         lockupContract = await LockupContract.deployed();
         return deployer.deploy(
-            XCLStats,
+            CLIStats,
             management.address
         );
     }).then(async () => {
-       stats = await XCLStats.deployed();
+       stats = await CLIStats.deployed();
     }).then(async () => {
 
         await management.registerContract(CONTRACT_TOKEN, token.address)

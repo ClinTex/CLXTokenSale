@@ -4,10 +4,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./managment/Managed.sol";
 import "./LockupContract.sol";
-import "./CLXAllocator.sol";
+import "./CLIAllocator.sol";
 
 
-contract CLXToken is ERC20, ERC20Detailed, Managed {
+contract CLIToken is ERC20, ERC20Detailed, Managed {
 
     modifier requireUnlockedBalance(
         address _address,
@@ -34,7 +34,7 @@ contract CLXToken is ERC20, ERC20Detailed, Managed {
         address _management
     )
         public
-        ERC20Detailed("ClinTex", "CLX", 18)
+        ERC20Detailed("ClinTex", "CLI", 18)
         Managed(_management)
     {
     }
@@ -49,7 +49,7 @@ contract CLXToken is ERC20, ERC20Detailed, Managed {
         returns (bool)
     {
         require(
-            _amount <= CLXAllocator(
+            _amount <= CLIAllocator(
                 management.contractRegistry(CONTRACT_ALLOCATOR)
             ).tokensAvailable(totalSupply()),
             ERROR_WRONG_AMOUNT

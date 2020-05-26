@@ -1,16 +1,16 @@
 pragma solidity 0.5.17;
 
-import "../XCLContribution.sol";
+import "../CLIContribution.sol";
 
 
-contract ContributionTest is XCLContribution {
+contract ContributionTest is CLIContribution {
 
     constructor(
         address payable _receiver,
         address _management
     )
         public
-        XCLContribution(_receiver, _management)
+        CLIContribution(_receiver, _management)
     {}
 
     function testUpdateDate(uint256 _id, uint256 _time) public {

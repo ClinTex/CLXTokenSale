@@ -11,7 +11,7 @@ contract Constants {
     uint256 public constant CAN_INTERACT_WITH_ALLOCATOR = 5;
     uint256 public constant CAN_SET_ALLOCATOR_MAX_SUPPLY = 6;
     uint256 public constant CAN_PAUSE_TOKENS = 7;
-    uint256 public constant EXCLUDED_ADDRESSES = 8;
+    uint256 public constant ECLIUDED_ADDRESSES = 8;
     uint256 public constant WHITELISTED = 9;
     uint256 public constant SIGNERS = 10;
     uint256 public constant EXTERNAL_CONTRIBUTORS = 11;

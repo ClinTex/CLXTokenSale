@@ -2,12 +2,12 @@ pragma solidity 0.5.17;
 
 import "./managment/Managed.sol";
 import "./allocator/TokenAllocator.sol";
-import "./XCLPricingStrategy.sol";
-import "./XCLCrowdsale.sol";
-import "./XCLToken.sol";
+import "./CLIPricingStrategy.sol";
+import "./CLICrowdsale.sol";
+import "./CLIToken.sol";
 
 
-contract XCLStats is Managed {
+contract CLIStats is Managed {
 
     uint256 public constant STATS_DATA_LENGTH = 8;
     uint256 public constant CURRENCY_CONTR_DATA_LENGTH = 3;
@@ -22,11 +22,11 @@ contract XCLStats is Managed {
         view
         returns (uint256 tokens, uint256 tokensExcludingBonus, uint256 bonus)
     {
-        uint256 tokensSold = XCLCrowdsale(
+        uint256 tokensSold = CLICrowdsale(
             address(management.contractRegistry(CONTRACT_CROWDSALE))
         ).tokensSold();
 
-        return XCLPricingStrategy(
+        return CLIPricingStrategy(
             management.contractRegistry(CONTRACT_PRICING)
         ).getTokensWithoutRestrictions(_currencyAmount, tokensSold);
     }
@@ -38,11 +38,11 @@ contract XCLStats is Managed {
         view
         returns (uint256 totalWeiAmount, uint256)
     {
-        uint256 tokensSold = XCLCrowdsale(
+        uint256 tokensSold = CLICrowdsale(
             management.contractRegistry(CONTRACT_CROWDSALE)
         ).tokensSold();
 
-        return XCLPricingStrategy(
+        return CLIPricingStrategy(
             management.contractRegistry(CONTRACT_PRICING)
         ).getWeis(0, tokensSold, _tokenAmount);
     }
@@ -68,7 +68,7 @@ contract XCLStats is Managed {
         view
         returns (uint256[] memory)
     {
-        XCLPricingStrategy pricing = XCLPricingStrategy(
+        CLIPricingStrategy pricing = CLIPricingStrategy(
             management.contractRegistry(CONTRACT_PRICING)
         );
 
@@ -86,7 +86,7 @@ contract XCLStats is Managed {
                 .div(tiers[i]) : 0;// tokenInUSD;
             tiersData[j++] = 0;// tokenInWei;
             tiersData[j++] = uint256(tiers[i.add(1)]);// maxTokensCollected;
-            tiersData[j++] = XCLCrowdsale(
+            tiersData[j++] = CLICrowdsale(
                 management.contractRegistry(CONTRACT_CROWDSALE)
             ).tokensSold();// soldTierTokens;
             tiersData[j++] = uint256(tiers[i.add(3)]);// discountPercents;
@@ -111,16 +111,16 @@ contract XCLStats is Managed {
         TokenAllocator allocator = TokenAllocator(
             management.contractRegistry(CONTRACT_ALLOCATOR)
         );
-        XCLCrowdsale crowdsale = XCLCrowdsale(
+        CLICrowdsale crowdsale = CLICrowdsale(
             management.contractRegistry(CONTRACT_CROWDSALE)
         );
-        XCLPricingStrategy pricing = XCLPricingStrategy(
+        CLIPricingStrategy pricing = CLIPricingStrategy(
             management.contractRegistry(CONTRACT_PRICING)
         );
 
         uint256[] memory stats = new uint256[](STATS_DATA_LENGTH);
         stats[0] = allocator.maxSupply();
-        stats[1] = XCLToken(
+        stats[1] = CLIToken(
             management.contractRegistry(CONTRACT_TOKEN)
         ).totalSupply();
         stats[2] = allocator.tokensAvailable(stats[1]);
@@ -145,7 +145,7 @@ contract XCLStats is Managed {
             _ethPerCurrency.length.mul(CURRENCY_CONTR_DATA_LENGTH)
         );
 
-        XCLPricingStrategy pricing = XCLPricingStrategy(
+        CLIPricingStrategy pricing = CLIPricingStrategy(
             management.contractRegistry(CONTRACT_PRICING)
         );
 

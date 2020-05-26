@@ -1,11 +1,11 @@
 pragma solidity 0.5.17;
 
 import "./allocator/MintableTokenAllocator.sol";
-import "./CLXToken.sol";
+import "./CLIToken.sol";
 import "./LockupContract.sol";
 
 
-contract CLXAllocator is MintableTokenAllocator {
+contract CLIAllocator is MintableTokenAllocator {
 
     /* solium-disable */
     address public constant strategicPartners = 0xcbE219cbF4A389079F35F75717E8F37FC0674BC3;

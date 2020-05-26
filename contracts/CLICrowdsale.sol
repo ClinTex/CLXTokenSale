@@ -1,14 +1,14 @@
 pragma solidity 0.5.17;
 
 import "./crowdsale/CrowdsaleImpl.sol";
-import "./XCLAllocator.sol";
-import "./XCLPricingStrategy.sol";
-import "./XCLContribution.sol";
-import "./XCLReferral.sol";
+import "./CLIAllocator.sol";
+import "./CLIPricingStrategy.sol";
+import "./CLIContribution.sol";
+import "./CLIReferral.sol";
 import "./LockupContract.sol";
 
 
-contract XCLCrowdsale is CrowdsaleImpl {
+contract CLICrowdsale is CrowdsaleImpl {
 
     uint256 public constant safeAgreementThreshold = 100000e5;
     uint256 public seedMaxSupply = 20000000e18;
@@ -55,7 +55,7 @@ contract XCLCrowdsale is CrowdsaleImpl {
     }
 
     function updateState() public {
-        (startDate, endDate) = XCLPricingStrategy(
+        (startDate, endDate) = CLIPricingStrategy(
             management.contractRegistry(CONTRACT_PRICING)
         ).getTierActualDates(tokensSold);
 
@@ -68,7 +68,7 @@ contract XCLCrowdsale is CrowdsaleImpl {
 
         if (endDate < block.timestamp && false == finalized) {
             uint256 valueToSubtract = (seedMaxSupply.sub(tokensSold)).div(2);
-            XCLAllocator allocatorContract = XCLAllocator(
+            CLIAllocator allocatorContract = CLIAllocator(
                 management.contractRegistry(CONTRACT_ALLOCATOR)
             );
             allocatorContract.decreaseCap(valueToSubtract);
@@ -112,7 +112,7 @@ contract XCLCrowdsale is CrowdsaleImpl {
             userSafeAgreementsList.push(_contributor);
         }
 
-        uint256 referralTokens = XCLReferral(
+        uint256 referralTokens = CLIReferral(
             management.contractRegistry(CONTRACT_REFERRAL)
         ).allocate(_contributor, _tokens);
 
@@ -121,7 +121,7 @@ contract XCLCrowdsale is CrowdsaleImpl {
             _tokens
         );
 
-        uint256 contributionId = XCLContribution(
+        uint256 contributionId = CLIContribution(
             management.contractRegistry(CONTRACT_FORWARDER)
         ).recordContribution(
             _contributor,
