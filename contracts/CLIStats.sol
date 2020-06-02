@@ -127,7 +127,7 @@ contract CLIStats is Managed {
         stats[3] = crowdsale.tokensSold();
         stats[4] = uint256(crowdsale.currentState());
         stats[5] = pricing.getActualTierIndex(stats[3]);
-        stats[6] = pricing.getTierUnsoldTokens(stats[5]);
+        stats[6] = pricing.getTierUnsoldTokens(stats[3]);
         stats[7] = pricing.getMinEtherInvest(stats[5]);
 
         return stats;
