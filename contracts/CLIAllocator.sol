@@ -8,14 +8,14 @@ import "./LockupContract.sol";
 contract CLIAllocator is MintableTokenAllocator {
 
     /* solium-disable */
-    address public constant strategicPartners = 0xcbE219cbF4A389079F35F75717E8F37FC0674BC3;
-    address public constant promotionsBounty = 0xbA680318Dcff9d1A14994E51AdC281aef3505f55;
-    address public constant shareholders = 0x3414f8c862eD8C931aA5E8f0D43A534057E931a7;
-    address public constant advisors = 0x868608bB49e3FCbEE36397eEf655983Ac53A1DA4;
-    address public constant pharmaIndustrialTrials = 0x592F71525076C7a09E953b578034dE6AfFeb98eE;
-    address public constant managementTeam = 0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8;
-    address public constant teamIncentive = 0x5eCAb5e32987D96D2c6007682fBa3639f8F8070f;
-    address public constant publicSaleTokensHolder = 0x6c2Cda925236Aab635e0Dbf73D11564403b50c35;
+    address public constant strategicPartners = 0xd5249aB86Ef7cE0651DF1b111E607f59950514c3;
+    address public constant promotionsBounty = 0x38069DD2C6D385a7dE7dbB90eF74E23B12D124e3;
+    address public constant shareholders = 0xA210F19b4C1c52dB213f88fdCA76fD83859052FA;
+    address public constant advisors = 0x5d6019C130158FC00bc4Dc1edc949Fa84b8ad098;
+    address public constant pharmaIndustrialTrials = 0x880574A5b701e017C254840063DFBd1f59dF9a15;
+    address public constant managementTeam = 0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0;
+    address public constant teamIncentive = 0xD4184B19170af014c595EF0b0321760d89918B95;
+    address public constant publicSaleTokensHolder = 0x9ED362b5A8aF29CBC06548ba5C2f40978ca48Ec1;
 
     uint256 public constant strategicPartnersTokensAmount = 20000000e18;
     uint256 public constant promotionsBountyTokensAmount = 5200000e18;
