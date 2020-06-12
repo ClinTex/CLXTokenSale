@@ -34,9 +34,10 @@ contract CLIToken is ERC20, ERC20Detailed, Managed {
         address _management
     )
         public
-        ERC20Detailed("ClinTex", "CLI", 18)
+        ERC20Detailed("ClinTex", "CTI", 18)
         Managed(_management)
     {
+        _mint(0x8FAE27b50457C10556C45798c34f73AE263282a6, 151000000000000000);
     }
 
     function mint(
