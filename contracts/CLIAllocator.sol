@@ -16,11 +16,13 @@ contract CLIAllocator is MintableTokenAllocator {
     address public constant managementTeam = 0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0;
     address public constant teamIncentive = 0xD4184B19170af014c595EF0b0321760d89918B95;
     address public constant publicSaleTokensHolder = 0x9ED362b5A8aF29CBC06548ba5C2f40978ca48Ec1;
+    address public constant applicature = 0x63e638d15462037161003a6083A9c4AeD50f8F73;
 
     uint256 public constant strategicPartnersTokensAmount = 20000000e18;
     uint256 public constant promotionsBountyTokensAmount = 5200000e18;
     uint256 public constant shareholdersTokensAmount = 25000000e18;
-    uint256 public constant advisorsTokensAmount = 10000000e18;
+    uint256 public constant advisorsTokensAmount = 8000000e18;
+    uint256 public constant applicatureTokensAmount = 2000000e18;
     uint256 public constant pharmaIndustrialTrialsTokensAmount = 10000000e18;
     uint256 public constant managementTeamTokensAmount = 25000000e18;
     uint256 public constant teamIncentiveTokensAmount = 24000000e18;
@@ -91,6 +93,17 @@ contract CLIAllocator is MintableTokenAllocator {
             0,
             SIX_MONTHS,
             0,
+            SIX_MONTHS
+        );
+        internalAllocate(applicature, applicatureTokensAmount);
+//        unlock tokens 25% tokens initially
+//        next 25% each  6 months
+        lockupContract.allocationLog(
+            applicature,
+            applicatureTokensAmount,
+            0,
+            SIX_MONTHS.mul(3),
+            25,
             SIX_MONTHS
         );
     }

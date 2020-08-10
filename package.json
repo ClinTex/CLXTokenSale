@@ -31,7 +31,6 @@
     "test": "test"
   },
   "dependencies": {
-    "remixd": "0.1.8-alpha.14",
     "dotenv": "^6.2.0",
     "mz": "^2.7.0",
     "solium-plugin-consensys": "^0.0.0",
@@ -65,7 +64,7 @@
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.18.0",
     "mocha-multi-reporters": "^1.1.7",
-    "remixd": "^0.1.8-alpha.14",
+    "remixd": "^0.2.3-alpha.4",
     "solhint": "^2.3.0",
     "solidity-coverage": "^0.7.4",
     "solium": "^1.2.5"

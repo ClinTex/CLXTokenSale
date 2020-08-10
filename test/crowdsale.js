@@ -155,6 +155,8 @@ console.log({v, r, s});
 
         contr.token = await CLIToken.new(contr.management.address, {from: owner});
 
+        expect(await contr.token.totalSupply()).to.be.bignumber.equal('151000000000000000'
+        );
         contr.allocator = await CLIAllocator.new(
             '200000000000000000000000000',
             contr.management.address,
@@ -205,102 +207,7 @@ console.log({v, r, s});
         await contr.management.setPermission(signAddress, CAN_SET_WHITELISTED, true, {from: owner});
         await contr.management.setWhitelisted(other, true, {from: signAddress});
     });
-
-    it("check contribution with sign", async function () {
-        await Utils.checkState({crowdsale: contr.crowdsale}, {
-            crowdsale: {
-                startDate: startAt,
-                endDate: new BigNumber(startAt).plus(6*MONTH_IN_SECONDS).valueOf(),
-                currentState: 3,
-                tokensSold: 0,
-                bonusProduced: 0,
-                safeAgreementThreshold: '10000000000',
-                seedMaxSupply: '20000000000000000000000000'
-            }
-        });
-
-        await contr.crowdsale.updateState()
-            .then(Utils.receiptShouldSucceed);
-        //
-        // await contr.crowdsale.externalContribution(
-        //     other,
-        //     new BigNumber('100').multipliedBy(currencyPrecision).valueOf(),
-        //     {from:signAddress}
-        // )
-        //     .then(Utils.receiptShouldSucceed);
-
-        await Utils.sendTransaction(
-            contr.crowdsale, other, web3.utils.toWei("0.01", "ether"),
-
-        )
-        /*
-        // assert.equal(
-        //     new BigNumber(await contr.token.balanceOf.call(other)).valueOf(),
-        //     new BigNumber('34368000000000000000').valueOf(),
-        //     "balance is on equal"
-        // );
-
-         */
-        // await expectRevert(
-        //     makeTransaction(contr.crowdsale, otherSecond, other, web3.utils.toWei("1", "ether")),
-        //     'ERROR_ACCESS_DENIED'
-        //     );
-        //
-        const obj ={
-            address: '0x59d8e848023db12322e5af4d6eb959dfda97ba0c'
-        }
-        let transfer = await makeTransaction(
-            obj,
-            owner,
-            '0x4dd93664e39fbb2a229e6a88eb1da53f4ccc88ac',
-            web3.utils.toWei("0.01", "ether")
-        )
-
-
-console.log('--------');
-        await generateVRS(
-            obj,
-            '27f0df3dac6fc312f2a948cb2ee3eab2bedf8be43c1171907966de0bcca336fa',
-            '0x4dd93664e39fbb2a229e6a88eb1da53f4ccc88ac'
-        );
-        // expect(transfer.gasUsed).to.be.below(GAS_LIMIT_PURCHASE);
-        //
-        //
-        // await contr.pricing.updateDates(
-        //     0,
-        //     startAt,
-        //     new BigNumber(startAt).plus(3600),
-        //     {from:owner}
-        // );
-        //
-        // await Utils.checkState({crowdsale: contr.crowdsale}, {
-        //     crowdsale: {
-        //         startDate: startAt,
-        //         endDate: new BigNumber(startAt).plus(6*MONTH_IN_SECONDS).valueOf(),
-        //         currentState: 3,
-        //         tokensSold: '5436800000000000000000',
-        //         bonusProduced: 0,
-        //         seedMaxSupply: '20000000000000000000000000',
-        //         collectedCurrency: new BigNumber('271.84').multipliedBy(currencyPrecision).valueOf(),
-        //     }
-        // });
-        //
-        // await makeTransaction(contr.crowdsale, signAddress, other, web3.utils.toWei("1", "ether"))
-        //
-        // await Utils.checkState({crowdsale: contr.crowdsale}, {
-        //     crowdsale: {
-        //         startDate: startAt,
-        //         endDate: new BigNumber(startAt).plus(3600).valueOf(),
-        //         currentState: 3,
-        //         tokensSold: '8873600000000000000000',
-        //         bonusProduced: 0,
-        //         seedMaxSupply: '20000000000000000000000000',
-        //         collectedCurrency: new BigNumber('443.68').multipliedBy(currencyPrecision).valueOf(),
-        //     }
-        // });
-
-    });
-    /*
+/*
     it("if contribution more than 100k should add to  saft agreement (external contribution)", async function () {
         await Utils.checkState({crowdsale: contr.crowdsale}, {
             crowdsale: {
@@ -456,7 +363,7 @@ console.log('--------');
             'unlocked is not equal'
         );
     });
-
+*/
     describe('CLIAllocator',  async () => {
         beforeEach(async function () {
             await contr.allocator.allocateRequiredTokensToHolders({from:owner});
@@ -465,19 +372,20 @@ console.log('--------');
             await Utils.checkState({token: contr.token}, {
                 token: {
                     balanceOf: [
-                        {['0xcbE219cbF4A389079F35F75717E8F37FC0674BC3']: web3.utils.toWei("20000000", "ether")},
-                        {['0xbA680318Dcff9d1A14994E51AdC281aef3505f55']: web3.utils.toWei("5200000", "ether")},
-                        {['0x3414f8c862eD8C931aA5E8f0D43A534057E931a7']: web3.utils.toWei("25000000", "ether")},
-                        {['0x868608bB49e3FCbEE36397eEf655983Ac53A1DA4']: web3.utils.toWei("10000000", "ether")},
-                        {['0x592F71525076C7a09E953b578034dE6AfFeb98eE']: web3.utils.toWei("10000000", "ether")},
-                        {['0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8']: web3.utils.toWei("25000000", "ether")},
-                        {['0x5eCAb5e32987D96D2c6007682fBa3639f8F8070f']: web3.utils.toWei("24000000", "ether")},
-                        {['0x6c2Cda925236Aab635e0Dbf73D11564403b50c35']: web3.utils.toWei("60000000", "ether")},
+                        {['0xd5249aB86Ef7cE0651DF1b111E607f59950514c3']: web3.utils.toWei("20000000", "ether")},
+                        {['0x38069DD2C6D385a7dE7dbB90eF74E23B12D124e3']: web3.utils.toWei("5200000", "ether")},
+                        {['0xA210F19b4C1c52dB213f88fdCA76fD83859052FA']: web3.utils.toWei("25000000", "ether")},
+                        {['0x5d6019C130158FC00bc4Dc1edc949Fa84b8ad098']: web3.utils.toWei("8000000", "ether")},
+                        {['0x880574A5b701e017C254840063DFBd1f59dF9a15']: web3.utils.toWei("10000000", "ether")},
+                        {['0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0']: web3.utils.toWei("25000000", "ether")},
+                        {['0xD4184B19170af014c595EF0b0321760d89918B95']: web3.utils.toWei("24000000", "ether")},
+                        {['0x9ED362b5A8aF29CBC06548ba5C2f40978ca48Ec1']: web3.utils.toWei("60000000", "ether")},
+                        {['0x63e638d15462037161003a6083A9c4AeD50f8F73']: web3.utils.toWei("2000000", "ether")},
                     ],
                 }
             });
              expect(await contr.token.totalSupply()).to.be.bignumber.equal(
-                 web3.utils.toWei('179200000', "ether")
+                 web3.utils.toWei('179200000.151', "ether")
              );
             await expectRevert( contr.allocator.allocateRequiredTokensToHolders({from:owner}),'ERROR_NOT_AVAILABLE')
 
@@ -486,7 +394,7 @@ console.log('--------');
         it("check locking periods strategicPartners", async () =>{
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0xcbE219cbF4A389079F35F75717E8F37FC0674BC3',
+                    '0xd5249aB86Ef7cE0651DF1b111E607f59950514c3',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('20000000').multipliedBy(precision)
                 )).valueOf(),
@@ -499,7 +407,7 @@ console.log('--------');
                 })
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0xcbE219cbF4A389079F35F75717E8F37FC0674BC3',
+                    '0xd5249aB86Ef7cE0651DF1b111E607f59950514c3',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('20000000').multipliedBy(precision)
                 )).valueOf(),
@@ -511,7 +419,7 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0xbA680318Dcff9d1A14994E51AdC281aef3505f55',
+                    '0x38069DD2C6D385a7dE7dbB90eF74E23B12D124e3',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('5200000').multipliedBy(precision)
                 )).valueOf(),
@@ -524,7 +432,7 @@ console.log('--------');
                 })
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0xbA680318Dcff9d1A14994E51AdC281aef3505f55',
+                    '0x38069DD2C6D385a7dE7dbB90eF74E23B12D124e3',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('5200000').multipliedBy(precision)
                 )).valueOf(),
@@ -533,7 +441,7 @@ console.log('--------');
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    "0xbA680318Dcff9d1A14994E51AdC281aef3505f55",
+                    "0x38069DD2C6D385a7dE7dbB90eF74E23B12D124e3",
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('5200000').multipliedBy(precision)
                 )).valueOf(),
@@ -542,7 +450,7 @@ console.log('--------');
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    "0xbA680318Dcff9d1A14994E51AdC281aef3505f55",
+                    "0x38069DD2C6D385a7dE7dbB90eF74E23B12D124e3",
                     new BigNumber(startAt).plus(7 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('5200000').multipliedBy(precision)
                 )).valueOf(),
@@ -554,7 +462,7 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3414f8c862eD8C931aA5E8f0D43A534057E931a7',
+                    '0xA210F19b4C1c52dB213f88fdCA76fD83859052FA',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -567,7 +475,7 @@ console.log('--------');
                 })
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3414f8c862eD8C931aA5E8f0D43A534057E931a7',
+                    '0xA210F19b4C1c52dB213f88fdCA76fD83859052FA',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -576,7 +484,7 @@ console.log('--------');
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3414f8c862eD8C931aA5E8f0D43A534057E931a7',
+                    '0xA210F19b4C1c52dB213f88fdCA76fD83859052FA',
                     new BigNumber(startAt).plus(13 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -588,9 +496,9 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x868608bB49e3FCbEE36397eEf655983Ac53A1DA4',
+                    '0x5d6019C130158FC00bc4Dc1edc949Fa84b8ad098',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
-                    new BigNumber('10000000').multipliedBy(precision)
+                    new BigNumber('8000000').multipliedBy(precision)
                 )).valueOf(),
                 new BigNumber('0').multipliedBy(precision).valueOf(),
                 'unlocked is not equal'
@@ -602,18 +510,18 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x868608bB49e3FCbEE36397eEf655983Ac53A1DA4',
+                    '0x5d6019C130158FC00bc4Dc1edc949Fa84b8ad098',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
-                    new BigNumber('10000000').multipliedBy(precision)
+                    new BigNumber('8000000').multipliedBy(precision)
                 )).valueOf(),
-                new BigNumber('10000000').multipliedBy(precision).valueOf(),
+                new BigNumber('8000000').multipliedBy(precision).valueOf(),
                 'unlocked is not equal'
             );
         });
         it("check locking periods pharmaIndustrialTrials", async () =>{
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x592F71525076C7a09E953b578034dE6AfFeb98eE',
+                    '0x880574A5b701e017C254840063DFBd1f59dF9a15',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('10000000').multipliedBy(precision)
                 )).valueOf(),
@@ -627,7 +535,7 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x592F71525076C7a09E953b578034dE6AfFeb98eE',
+                    '0x880574A5b701e017C254840063DFBd1f59dF9a15',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('10000000').multipliedBy(precision)
                 )).valueOf(),
@@ -635,11 +543,11 @@ console.log('--------');
                 'unlocked is not equal'
             );
             await contr.allocator.unlockManuallyLockedBalances(
-                '0x592F71525076C7a09E953b578034dE6AfFeb98eE',{from: owner}
+                '0x880574A5b701e017C254840063DFBd1f59dF9a15',{from: owner}
                 );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x592F71525076C7a09E953b578034dE6AfFeb98eE',
+                    '0x880574A5b701e017C254840063DFBd1f59dF9a15',
                     new BigNumber(startAt).plus(0 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('10000000').multipliedBy(precision)
                 )).valueOf(),
@@ -651,7 +559,7 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8',
+                    '0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -664,7 +572,7 @@ console.log('--------');
                 })
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8',
+                    '0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -673,7 +581,7 @@ console.log('--------');
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8',
+                    '0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0',
                     new BigNumber(startAt).plus(13 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -682,7 +590,7 @@ console.log('--------');
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8',
+                    '0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0',
                     new BigNumber(startAt).plus(23 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -691,7 +599,7 @@ console.log('--------');
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x3b7E6021A5f3E7BF98b45857dBC14328b76623b8',
+                    '0x1e2Ce74Bc0a9A9fB2D6b3f630d585E0c00FF66B0',
                     new BigNumber(startAt).plus(24 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('25000000').multipliedBy(precision)
                 )).valueOf(),
@@ -702,7 +610,7 @@ console.log('--------');
         it("check locking periods teamIncentive", async () =>{
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x5eCAb5e32987D96D2c6007682fBa3639f8F8070f',
+                    '0xD4184B19170af014c595EF0b0321760d89918B95',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('24000000').multipliedBy(precision)
                 )).valueOf(),
@@ -716,7 +624,7 @@ console.log('--------');
 
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x5eCAb5e32987D96D2c6007682fBa3639f8F8070f',
+                    '0xD4184B19170af014c595EF0b0321760d89918B95',
                     new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('24000000').multipliedBy(precision)
                 )).valueOf(),
@@ -724,11 +632,11 @@ console.log('--------');
                 'unlocked is not equal'
             );
             await contr.allocator.unlockManuallyLockedBalances(
-                '0x5eCAb5e32987D96D2c6007682fBa3639f8F8070f',{from: owner}
+                '0xD4184B19170af014c595EF0b0321760d89918B95',{from: owner}
             );
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x5eCAb5e32987D96D2c6007682fBa3639f8F8070f',
+                    '0xD4184B19170af014c595EF0b0321760d89918B95',
                     new BigNumber(startAt).plus(0 * MONTH_IN_SECONDS).valueOf(),
                     new BigNumber('24000000').multipliedBy(precision)
                 )).valueOf(),
@@ -736,11 +644,36 @@ console.log('--------');
                 'unlocked is not equal'
             );
         });
+        it("check locking periods applicature", async () =>{
+            assert.equal(
+                new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
+                    '0x63e638d15462037161003a6083A9c4AeD50f8F73',
+                    new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
+                    new BigNumber('2000000').multipliedBy(precision)
+                )).valueOf(),
+                new BigNumber('500000').multipliedBy(precision).valueOf(),
+                'unlocked is not equal'
+            );
+            await contr.lockupContract.setPostponedStartDate(new BigNumber(startAt).minus(1000).valueOf(),
+                {
+                    from: owner
+                })
 
+            assert.equal(
+                new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
+                    '0x63e638d15462037161003a6083A9c4AeD50f8F73',
+                    new BigNumber(startAt).plus(6 * MONTH_IN_SECONDS).valueOf(),
+                    new BigNumber('2000000').multipliedBy(precision)
+                )).valueOf(),
+                new BigNumber('1000000').multipliedBy(precision).valueOf(),
+                'unlocked is not equal'
+            );
+        });
+/*
         it("check publicSaleTokensAmount", async () =>{
             assert.equal(
                 new BigNumber(await contr.lockupContract.getUnlockedBalance.call(
-                    '0x6c2Cda925236Aab635e0Dbf73D11564403b50c35',
+                    '0x9ED362b5A8aF29CBC06548ba5C2f40978ca48Ec1',
                     new BigNumber(startAt).valueOf(),
                     new BigNumber('60000000').multipliedBy(precision)
                 )).valueOf(),
@@ -782,13 +715,13 @@ console.log('--------');
                 .then(Utils.receiptShouldSucceed);
             assert.equal(
                 new BigNumber(await contr.token.balanceOf.call(
-                    '0x6c2Cda925236Aab635e0Dbf73D11564403b50c35'
+                    '0x9ED362b5A8aF29CBC06548ba5C2f40978ca48Ec1'
                 )).valueOf(),
                 new BigNumber('60000000').multipliedBy(precision).plus('9999000000000000000000000').valueOf(),
                 'balance is not equal'
             );
         });
-    });
 
-     */
+ */
+    });
 });
